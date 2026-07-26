@@ -271,14 +271,20 @@
     function drawFrameBackground(theme) {
       switch (theme) {
         case 'blue':
-          // Pure Shade of Blue
-          ctx.fillStyle = '#1d3557';
+          // Light blue to dark blue gradient
+          const blueGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+          blueGrad.addColorStop(0, '#5390d9');
+          blueGrad.addColorStop(1, '#0b2038');
+          ctx.fillStyle = blueGrad;
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           break;
 
         case 'red':
-          // Pure Shade of Red
-          ctx.fillStyle = '#8b0000';
+          // Light red to dark red gradient
+          const redGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+          redGrad.addColorStop(0, '#ff4d4d');
+          redGrad.addColorStop(1, '#5c0000');
+          ctx.fillStyle = redGrad;
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           break;
 
@@ -603,10 +609,23 @@
 
       drawSideDecorations(selectedTheme, topHeaderOffset, photoHeight, photoGap);
 
-      if (selectedTheme === 'blue' || selectedTheme === 'red') {
+      // --- TEXT/TITLES SECTION ---
+      if (selectedTheme === 'blue') {
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 11px "Segoe UI", sans-serif';
+        ctx.font = '900 16px "Segoe UI", sans-serif';
         ctx.textAlign = 'center';
+        ctx.fillText("SHADE OF BLUE", canvas.width / 2, canvas.height - 35);
+        
+        ctx.font = 'bold 10px "Segoe UI", sans-serif';
+        ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, canvas.height - 18);
+
+      } else if (selectedTheme === 'red') {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 16px "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText("SHADE OF RED", canvas.width / 2, canvas.height - 35);
+        
+        ctx.font = 'bold 10px "Segoe UI", sans-serif';
         ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, canvas.height - 18);
 
       } else if (selectedTheme === 'moonlight') {
