@@ -89,7 +89,6 @@
       align-items: center;
     }
 
-    /* Frame Selector Controls */
     .theme-selector {
       display: none;
       margin-top: 15px;
@@ -151,15 +150,15 @@
   </div>
 
   <div class="strip-container">
-    <canvas id="canvas" width="260" height="560" style="display:none;"></canvas>
+    <canvas id="canvas" width="260" height="580" style="display:none;"></canvas>
     
     <div id="theme-selector" class="theme-selector">
       <label for="frame-theme">Choose Frame Style:</label>
       <select id="frame-theme" onchange="changeTheme()">
+        <option value="newspaper">Newspaper Press (Vintage Times)</option>
         <option value="white">Classic White</option>
         <option value="checkered">Checkered Pink (Y2K)</option>
         <option value="vintage">Vintage Sepia</option>
-        <option value="newspaper">Newspaper Press</option>
         <option value="beach">Sunny Beach</option>
         <option value="moonlight">Moonlight Night</option>
       </select>
@@ -214,8 +213,8 @@
         countdownEl.style.display = 'none';
 
         const tempCanvas = document.createElement('canvas');
-        const targetWidth = 220;
-        const targetHeight = 150;
+        const targetWidth = 210;
+        const targetHeight = 140;
         tempCanvas.width = targetWidth;
         tempCanvas.height = targetHeight;
         const tempCtx = tempCanvas.getContext('2d');
@@ -247,7 +246,6 @@
       }
     }
 
-    // Helper: Draw Checkered Pattern
     function drawCheckeredPattern(color1, color2, squareSize) {
       for (let y = 0; y < canvas.height; y += squareSize) {
         for (let x = 0; x < canvas.width; x += squareSize) {
@@ -257,49 +255,58 @@
       }
     }
 
-    // Draw background frames according to chosen theme
     function drawFrameBackground(theme) {
       switch (theme) {
+        case 'newspaper':
+          // Aged Newspaper off-white background
+          ctx.fillStyle = '#e8e4d9';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          // Outer black border
+          ctx.strokeStyle = '#222';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(4, 4, canvas.width - 8, canvas.height - 8);
+
+          // Header Text (The Daily Times)
+          ctx.fillStyle = '#111';
+          ctx.font = 'bold 22px "Times New Roman", Georgia, serif';
+          ctx.textAlign = 'center';
+          ctx.fillText("The Daily Times", canvas.width / 2, 32);
+
+          // Top divider lines & Date banner
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(15, 38); ctx.lineTo(canvas.width - 15, 38); ctx.stroke();
+          
+          ctx.font = 'italic 9px "Times New Roman", serif';
+          ctx.fillText(`VOL. I ... NO. 1      ${new Date().toLocaleDateString().toUpperCase()}      SPECIAL EDITION`, canvas.width / 2, 47);
+          
+          ctx.beginPath(); ctx.moveTo(15, 52); ctx.lineTo(canvas.width - 15, 52); ctx.stroke();
+          break;
+
         case 'checkered':
-          // Black & Pink Checkered Frame (Sample Style)
           drawCheckeredPattern('#1e1e1e', '#ffb6c1', 12);
           ctx.fillStyle = 'rgba(20, 20, 20, 0.85)';
           ctx.fillRect(10, 5, canvas.width - 20, canvas.height - 10);
           break;
 
         case 'vintage':
-          // Warm Parchment Vintage
           ctx.fillStyle = '#f4e4bc';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
-          // Darker vintage inner border
           ctx.strokeStyle = '#8b5a2b';
           ctx.lineWidth = 4;
           ctx.strokeRect(6, 6, canvas.width - 12, canvas.height - 12);
           break;
 
-        case 'newspaper':
-          // Newsprint Grey with Fine Grid Lines
-          ctx.fillStyle = '#e2ded0';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.strokeStyle = '#c5c0b0';
-          ctx.lineWidth = 1;
-          for (let y = 0; y < canvas.height; y += 10) {
-            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
-          }
-          break;
-
         case 'beach':
-          // Sand to Ocean Gradient
           const beachGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-          beachGrad.addColorStop(0, '#87ceeb');  // Sky Blue
-          beachGrad.addColorStop(0.5, '#20b2aa'); // Sea Cyan
-          beachGrad.addColorStop(1, '#f4a460');   // Sandy Yellow
+          beachGrad.addColorStop(0, '#87ceeb');
+          beachGrad.addColorStop(0.5, '#20b2aa');
+          beachGrad.addColorStop(1, '#f4a460');
           ctx.fillStyle = beachGrad;
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           break;
 
         case 'moonlight':
-          // Deep Night Blue Gradient
           const moonGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
           moonGrad.addColorStop(0, '#0b1d3a');
           moonGrad.addColorStop(1, '#2a085c');
@@ -315,7 +322,7 @@
       }
     }
 
-    // Nailong Character Renderer
+    // Character Renderers
     function drawNailong(x, y, size, angleDegrees, emotion = 'happy') {
       ctx.save();
       ctx.translate(x, y);
@@ -364,7 +371,6 @@
       ctx.restore();
     }
 
-    // Cute Rabbit Character Renderer
     function drawRabbit(x, y, size, angleDegrees) {
       ctx.save();
       ctx.translate(x, y);
@@ -397,43 +403,65 @@
     function renderPhotostrip() {
       const selectedTheme = frameThemeSelect.value;
       
-      // 1. Draw Frame Background Theme
+      // Clear canvas & Draw background
+      ctx.restore();
       drawFrameBackground(selectedTheme);
 
-      // 2. Draw Photo Frames
+      // Determine Y start position depending on header space
+      const topOffset = selectedTheme === 'newspaper' ? 62 : 18;
+      const photoWidth = 210;
+      const photoHeight = 145;
+      const photoX = 25;
+
       currentPhotos.forEach((photoCanvas, index) => {
-        const yOffset = 15 + (index * 165);
-        // Photo border shadow/outline
-        ctx.fillStyle = 'rgba(0,0,0,0.2)';
-        ctx.fillRect(18, yOffset - 2, 224, 154);
-        ctx.drawImage(photoCanvas, 20, yOffset);
+        const yOffset = topOffset + (index * (photoHeight + 12));
+        
+        ctx.save();
+        // Photo outline border
+        ctx.strokeStyle = (selectedTheme === 'newspaper') ? '#222' : 'rgba(0,0,0,0.15)';
+        ctx.lineWidth = (selectedTheme === 'newspaper') ? 2 : 1;
+        ctx.strokeRect(photoX - 1, yOffset - 1, photoWidth + 2, photoHeight + 2);
+
+        // Apply Grayscale Filter for Newspaper style
+        if (selectedTheme === 'newspaper') {
+          ctx.filter = 'grayscale(100%) contrast(110%)';
+        } else {
+          ctx.filter = 'none';
+        }
+
+        // Draw photo fitted perfectly to frame
+        ctx.drawImage(photoCanvas, photoX, yOffset, photoWidth, photoHeight);
+        ctx.restore();
       });
 
-      // 3. Draw Side Characters
-      drawNailong(11, 45, 26, -20, 'happy');
-      drawRabbit(11, 210, 26, 15);
-      drawNailong(11, 375, 26, -15, 'surprised');
-      drawRabbit(12, 500, 26, 20);
+      // Draw Side Characters
+      const cLeftX = 12;
+      const cRightX = 248;
 
-      drawRabbit(249, 85, 26, 20);
-      drawNailong(249, 250, 26, -20, 'wink');
-      drawRabbit(249, 415, 26, 15);
-      drawNailong(249, 510, 26, -10, 'excited');
+      drawNailong(cLeftX, topOffset + 30, 24, -20, 'happy');
+      drawRabbit(cLeftX, topOffset + 180, 24, 15);
+      drawNailong(cLeftX, topOffset + 320, 24, -15, 'surprised');
+      drawRabbit(cLeftX, topOffset + 440, 24, 20);
 
-      // 4. Draw Bottom Text / Date
+      drawRabbit(cRightX, topOffset + 60, 24, 20);
+      drawNailong(cRightX, topOffset + 210, 24, -20, 'wink');
+      drawRabbit(cRightX, topOffset + 350, 24, 15);
+      drawNailong(cRightX, topOffset + 460, 24, -10, 'excited');
+
+      // Bottom Footer Line
       ctx.fillStyle = (selectedTheme === 'moonlight' || selectedTheme === 'checkered') ? '#ffffff' : '#111111';
-      ctx.font = 'bold 12px sans-serif';
+      ctx.font = 'bold 11px "Times New Roman", serif';
       ctx.textAlign = 'center';
       
       if (selectedTheme === 'newspaper') {
-        ctx.fillText("DAILY EDITION • " + new Date().toLocaleDateString(), canvas.width / 2, 535);
+        ctx.fillText("• PHOTOSTRIP ARCHIVE EDITION •", canvas.width / 2, canvas.height - 15);
       } else if (selectedTheme === 'checkered') {
-        ctx.fillText("YOUNG & SHINE • " + new Date().toLocaleDateString(), canvas.width / 2, 535);
+        ctx.fillText("YOUNG & SHINE • " + new Date().toLocaleDateString(), canvas.width / 2, canvas.height - 15);
       } else {
-        ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, 535);
+        ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, canvas.height - 15);
       }
 
-      // Display controls & update download link
+      // Display & Download setup
       canvas.style.display = 'block';
       themeSelector.style.display = 'flex';
       downloadLink.href = canvas.toDataURL('image/png');
