@@ -14,39 +14,12 @@
       align-items: center;
       padding: 20px;
       margin: 0;
-      position: relative;
       min-height: 100vh;
       box-sizing: border-box;
-      overflow-x: hidden;
     }
 
-    h1 { margin-bottom: 5px; font-size: 1.5rem; z-index: 2; }
-    p { color: #aaa; margin-top: 0; font-size: 0.9rem; z-index: 2; }
-
-    /* Outer Character Stickers */
-    .sticker {
-      position: absolute;
-      width: 110px;
-      height: 110px;
-      z-index: 1;
-      pointer-events: none;
-      opacity: 0.9;
-    }
-
-    .sticker-left {
-      top: 100px;
-      left: calc(50% - 250px);
-    }
-
-    .sticker-right {
-      top: 120px;
-      right: calc(50% - 250px);
-    }
-
-    @media (max-width: 520px) {
-      .sticker-left { left: 5px; width: 75px; height: 75px; }
-      .sticker-right { right: 5px; width: 75px; height: 75px; }
-    }
+    h1 { margin-bottom: 5px; font-size: 1.5rem; }
+    p { color: #aaa; margin-top: 0; font-size: 0.9rem; }
 
     .booth-container {
       position: relative;
@@ -57,12 +30,12 @@
       padding: 12px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.5);
       text-align: center;
-      z-index: 2;
     }
 
+    /* Shorter preview box height (190px x 135px aspect ratio) */
     .video-wrapper {
       width: 100%;
-      height: 240px;
+      height: 185px;
       overflow: hidden;
       border-radius: 8px;
       background: #000;
@@ -81,7 +54,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 4rem;
+      font-size: 3.5rem;
       font-weight: bold;
       color: #00ffcc;
       text-shadow: 0 0 10px rgba(0,0,0,0.8);
@@ -115,7 +88,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      z-index: 2;
     }
 
     canvas {
@@ -140,37 +112,6 @@
 </head>
 <body>
 
-  <!-- Outer Background Nailong Character (Left) -->
-  <svg class="sticker sticker-left" viewBox="0 0 100 100">
-    <ellipse cx="50" cy="55" rx="35" ry="38" fill="#FFD700"/>
-    <ellipse cx="50" cy="62" rx="22" ry="24" fill="#FFF8DC"/>
-    <circle cx="36" cy="45" r="5" fill="#000"/>
-    <circle cx="64" cy="45" r="5" fill="#000"/>
-    <circle cx="38" cy="43" r="1.8" fill="#FFF"/>
-    <circle cx="66" cy="43" r="1.8" fill="#FFF"/>
-    <ellipse cx="28" cy="53" rx="4" ry="2.5" fill="#FFA07A"/>
-    <ellipse cx="72" cy="53" rx="4" ry="2.5" fill="#FFA07A"/>
-    <path d="M 42 56 Q 50 63 58 56" stroke="#000" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <polygon points="40,18 45,28 35,28" fill="#FF8C00"/>
-    <polygon points="60,18 65,28 55,28" fill="#FF8C00"/>
-  </svg>
-
-  <!-- Outer Background Cute Rabbit Character (Right) -->
-  <svg class="sticker sticker-right" viewBox="0 0 100 100">
-    <ellipse cx="38" cy="22" rx="7" ry="18" fill="#FFFFFF"/>
-    <ellipse cx="38" cy="22" rx="4" ry="12" fill="#FFB6C1"/>
-    <ellipse cx="62" cy="22" rx="7" ry="18" fill="#FFFFFF"/>
-    <ellipse cx="62" cy="22" rx="4" ry="12" fill="#FFB6C1"/>
-    <ellipse cx="50" cy="60" rx="32" ry="28" fill="#FFFFFF"/>
-    <circle cx="38" cy="55" r="4" fill="#333"/>
-    <circle cx="62" cy="55" r="4" fill="#333"/>
-    <circle cx="39" cy="53" r="1.5" fill="#FFF"/>
-    <circle cx="63" cy="53" r="1.5" fill="#FFF"/>
-    <polygon points="50,62 47,59 53,59" fill="#FFB6C1"/>
-    <ellipse cx="28" cy="62" rx="5" ry="3" fill="#FFB6C1"/>
-    <ellipse cx="72" cy="62" rx="5" ry="3" fill="#FFB6C1"/>
-  </svg>
-
   <h1>SnapStrip Photobooth</h1>
   <p>Take 3 snaps to build your photostrip!</p>
 
@@ -185,7 +126,8 @@
   </div>
 
   <div class="strip-container">
-    <canvas id="canvas" width="210" height="680" style="display:none;"></canvas>
+    <!-- Compact height canvas: 210px x 510px -->
+    <canvas id="canvas" width="210" height="510" style="display:none;"></canvas>
     <a id="download-link" class="download-btn" download="photostrip.png">Download Photo Strip</a>
   </div>
 
@@ -217,10 +159,10 @@
       for (let i = 0; i < 3; i++) {
         if (i > 0) {
           countdownEl.textContent = "Get Ready!";
-          countdownEl.style.fontSize = "1.5rem";
+          countdownEl.style.fontSize = "1.3rem";
           countdownEl.style.display = 'block';
           await sleep(1500);
-          countdownEl.style.fontSize = "4rem";
+          countdownEl.style.fontSize = "3.5rem";
         }
 
         for (let c = 3; c > 0; c--) {
@@ -230,9 +172,10 @@
         }
         countdownEl.style.display = 'none';
 
+        // Shorter photo dimensions: 190px wide x 135px high
         const tempCanvas = document.createElement('canvas');
         const targetWidth = 190;
-        const targetHeight = 180;
+        const targetHeight = 135;
         tempCanvas.width = targetWidth;
         tempCanvas.height = targetHeight;
         const tempCtx = tempCanvas.getContext('2d');
@@ -258,20 +201,80 @@
       snapBtn.disabled = false;
     }
 
+    function drawNailong(x, y, size) {
+      ctx.save();
+      ctx.translate(x, y);
+      // Body
+      ctx.fillStyle = '#FFD700';
+      ctx.beginPath(); ctx.ellipse(size/2, size*0.55, size*0.35, size*0.38, 0, 0, Math.PI*2); ctx.fill();
+      // Belly
+      ctx.fillStyle = '#FFF8DC';
+      ctx.beginPath(); ctx.ellipse(size/2, size*0.62, size*0.22, size*0.24, 0, 0, Math.PI*2); ctx.fill();
+      // Eyes
+      ctx.fillStyle = '#000';
+      ctx.beginPath(); ctx.arc(size*0.36, size*0.45, size*0.05, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(size*0.64, size*0.45, size*0.05, 0, Math.PI*2); ctx.fill();
+      // Cheeks
+      ctx.fillStyle = '#FFA07A';
+      ctx.beginPath(); ctx.ellipse(size*0.28, size*0.53, size*0.04, size*0.025, 0, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(size*0.72, size*0.53, size*0.04, size*0.025, 0, 0, Math.PI*2); ctx.fill();
+      // Mouth
+      ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(size/2, size*0.54, size*0.08, 0.1*Math.PI, 0.9*Math.PI); ctx.stroke();
+      // Horns
+      ctx.fillStyle = '#FF8C00';
+      ctx.beginPath(); ctx.moveTo(size*0.35, size*0.25); ctx.lineTo(size*0.42, size*0.12); ctx.lineTo(size*0.48, size*0.25); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(size*0.52, size*0.25); ctx.lineTo(size*0.58, size*0.12); ctx.lineTo(size*0.65, size*0.25); ctx.fill();
+      ctx.restore();
+    }
+
+    function drawRabbit(x, y, size) {
+      ctx.save();
+      ctx.translate(x, y);
+      // Ears
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath(); ctx.ellipse(size*0.38, size*0.22, size*0.07, size*0.18, 0, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(size*0.62, size*0.22, size*0.07, size*0.18, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#FFB6C1';
+      ctx.beginPath(); ctx.ellipse(size*0.38, size*0.22, size*0.04, size*0.12, 0, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(size*0.62, size*0.22, size*0.04, size*0.12, 0, 0, Math.PI*2); ctx.fill();
+      // Head
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath(); ctx.ellipse(size/2, size*0.60, size*0.32, size*0.28, 0, 0, Math.PI*2); ctx.fill();
+      // Eyes
+      ctx.fillStyle = '#333';
+      ctx.beginPath(); ctx.arc(size*0.38, size*0.55, size*0.04, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(size*0.62, size*0.55, size*0.04, 0, Math.PI*2); ctx.fill();
+      // Cheeks
+      ctx.fillStyle = '#FFB6C1';
+      ctx.beginPath(); ctx.ellipse(size*0.28, size*0.62, size*0.05, size*0.03, 0, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(size*0.72, size*0.62, size*0.05, size*0.03, 0, 0, Math.PI*2); ctx.fill();
+      // Nose
+      ctx.fillStyle = '#FFB6C1';
+      ctx.beginPath(); ctx.arc(size/2, size*0.60, size*0.03, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+
     function renderPhotostrip(photos) {
+      // White strip background
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // Draw 3 shorter photos
       photos.forEach((photoCanvas, index) => {
-        const yOffset = 10 + (index * 195);
+        const yOffset = 10 + (index * 145);
         ctx.drawImage(photoCanvas, 10, yOffset);
       });
 
-      // Bottom Text: ONLY the Date
+      // Draw characters at the bottom inside the frame
+      drawNailong(8, 445, 55);
+      drawRabbit(147, 445, 55);
+
+      // Draw ONLY the Date centered at bottom
       ctx.fillStyle = '#111';
       ctx.font = 'bold 12px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, 655);
+      ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, 485);
 
       canvas.style.display = 'block';
       downloadLink.href = canvas.toDataURL('image/png');
