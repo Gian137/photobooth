@@ -21,10 +21,10 @@
     h1 { margin-bottom: 5px; font-size: 1.5rem; }
     p { color: #aaa; margin-top: 0; font-size: 0.9rem; }
 
-    /* Container adjusted slightly wider */
+    /* Container adjusted wider */
     .booth-container {
       position: relative;
-      width: 295px;
+      width: 320px;
       max-width: 90%;
       background: #1e1e1e;
       border-radius: 12px;
@@ -33,7 +33,7 @@
       text-align: center;
     }
 
-    /* Video frame updated to wider proportions while maintaining 150px height */
+    /* Video frame updated to wider proportions */
     .video-wrapper {
       width: 100%;
       height: 150px;
@@ -127,8 +127,8 @@
   </div>
 
   <div class="strip-container">
-    <!-- Canvas width increased slightly to 235px to accommodate wider 195px photos -->
-    <canvas id="canvas" width="235" height="560" style="display:none;"></canvas>
+    <!-- Canvas width increased to 260px for wider photos -->
+    <canvas id="canvas" width="260" height="560" style="display:none;"></canvas>
     <a id="download-link" class="download-btn" download="photostrip.png">Download Photo Strip</a>
   </div>
 
@@ -173,9 +173,9 @@
         }
         countdownEl.style.display = 'none';
 
-        // Photo dimensions widened slightly (195px wide x 150px high)
+        // Widened photo dimensions (220px wide x 150px high)
         const tempCanvas = document.createElement('canvas');
-        const targetWidth = 195;
+        const targetWidth = 220;
         const targetHeight = 150;
         tempCanvas.width = targetWidth;
         tempCanvas.height = targetHeight;
@@ -285,7 +285,7 @@
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Photos positioned in center with 195px width
+      // Photos centered with 220px width
       photos.forEach((photoCanvas, index) => {
         const yOffset = 15 + (index * 165);
         ctx.drawImage(photoCanvas, 20, yOffset);
@@ -297,11 +297,11 @@
       drawNailong(11, 375, 26, -15, 'surprised');
       drawRabbit(12, 500, 26, 20);
 
-      // Right side stack (adjusted X coordinate for wider canvas)
-      drawRabbit(224, 85, 26, 20);
-      drawNailong(224, 250, 26, -20, 'wink');
-      drawRabbit(224, 415, 26, 15);
-      drawNailong(224, 510, 26, -10, 'excited');
+      // Right side stack (aligned to 249px right edge)
+      drawRabbit(249, 85, 26, 20);
+      drawNailong(249, 250, 26, -20, 'wink');
+      drawRabbit(249, 415, 26, 15);
+      drawNailong(249, 510, 26, -10, 'excited');
 
       // Bottom Date
       ctx.fillStyle = '#111';
