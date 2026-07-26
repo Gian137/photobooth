@@ -16,16 +16,17 @@
       margin: 0;
     }
 
-    h1 { margin-bottom: 5px; }
-    p { color: #aaa; margin-top: 0; }
+    h1 { margin-bottom: 5px; font-size: 1.5rem; }
+    p { color: #aaa; margin-top: 0; font-size: 0.9rem; }
 
+    /* Made frame narrower: changed from 480px to 360px */
     .booth-container {
       position: relative;
-      width: 480px;
-      max-width: 100%;
+      width: 360px;
+      max-width: 90%;
       background: #1e1e1e;
       border-radius: 12px;
-      padding: 15px;
+      padding: 12px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.5);
       text-align: center;
     }
@@ -42,7 +43,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 5rem;
+      font-size: 4.5rem;
       font-weight: bold;
       color: #00ffcc;
       text-shadow: 0 0 10px rgba(0,0,0,0.8);
@@ -50,33 +51,34 @@
     }
 
     .controls {
-      margin-top: 15px;
+      margin-top: 12px;
       display: flex;
       justify-content: center;
-      gap: 10px;
     }
 
     button {
       background: #007acc;
       color: white;
       border: none;
-      padding: 10px 20px;
-      font-size: 1rem;
+      padding: 10px 18px;
+      font-size: 0.95rem;
       border-radius: 6px;
       cursor: pointer;
       transition: 0.2s ease;
+      width: 100%;
     }
 
     button:hover { background: #005999; }
     button:disabled { background: #444; cursor: not-allowed; }
 
     .strip-container {
-      margin-top: 25px;
+      margin-top: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
+    /* Narrower photostrip layout */
     canvas {
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
@@ -91,6 +93,7 @@
       color: white;
       padding: 10px 20px;
       border-radius: 6px;
+      font-weight: bold;
     }
 
     .download-btn:hover { background: #218838; }
@@ -110,7 +113,8 @@
   </div>
 
   <div class="strip-container">
-    <canvas id="canvas" width="300" height="820" style="display:none;"></canvas>
+    <!-- Narrower canvas dimensions (260 x 720) -->
+    <canvas id="canvas" width="260" height="720" style="display:none;"></canvas>
     <a id="download-link" class="download-btn" download="photostrip.png">Download Photo Strip</a>
   </div>
 
@@ -122,7 +126,6 @@
     const ctx = canvas.getContext('2d');
     const downloadLink = document.getElementById('download-link');
 
-    // Access the user's webcam
     async function initCamera() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -140,8 +143,17 @@
       snapBtn.disabled = true;
       const photos = [];
 
-      // Take 3 pictures with countdown
       for (let i = 0; i < 3; i++) {
+        // Delay before starting countdown for shots after the 1st
+        if (i > 0) {
+          countdownEl.textContent = "Get Ready!";
+          countdownEl.style.fontSize = "2rem";
+          countdownEl.style.display = 'block';
+          await sleep(1500); // 1.5 second pause between shots
+          countdownEl.style.fontSize = "4.5rem";
+        }
+
+        // 3-2-1 Countdown
         for (let c = 3; c > 0; c--) {
           countdownEl.textContent = c;
           countdownEl.style.display = 'block';
@@ -149,19 +161,17 @@
         }
         countdownEl.style.display = 'none';
 
-        // Capture frame
+        // Snap picture
         const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = 280;
-        tempCanvas.height = 210;
+        tempCanvas.width = 240;
+        tempCanvas.height = 180;
         const tempCtx = tempCanvas.getContext('2d');
         
-        // Draw mirrored image to temporary canvas
         tempCtx.translate(tempCanvas.width, 0);
         tempCtx.scale(-1, 1);
         tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
         
         photos.push(tempCanvas);
-        await sleep(500); // Brief pause between shots
       }
 
       renderPhotostrip(photos);
@@ -169,29 +179,24 @@
     }
 
     function renderPhotostrip(photos) {
-      // Background strip styling
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Draw each snapshot onto the photostrip canvas
       photos.forEach((photoCanvas, index) => {
-        const yOffset = 15 + (index * 225); // Vertical spacing
+        const yOffset = 12 + (index * 195);
         ctx.drawImage(photoCanvas, 10, yOffset);
       });
 
-      // Add simple branding at the bottom
       ctx.fillStyle = '#111';
-      ctx.font = 'bold 16px sans-serif';
+      ctx.font = 'bold 14px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('PHOTOBOOTH • ' + new Date().toLocaleDateString(), canvas.width / 2, 780);
+      ctx.fillText('PHOTOBOOTH • ' + new Date().toLocaleDateString(), canvas.width / 2, 690);
 
-      // Display results and enable download
       canvas.style.display = 'block';
       downloadLink.href = canvas.toDataURL('image/png');
       downloadLink.style.display = 'inline-block';
     }
 
-    // Start video on load
     initCamera();
   </script>
 </body>
