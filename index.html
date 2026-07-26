@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VS Code Photobooth</title>
+  <title>SnapStrip Photobooth</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -14,14 +14,42 @@
       align-items: center;
       padding: 20px;
       margin: 0;
+      position: relative;
+      min-height: 100vh;
+      box-sizing: border-box;
+      overflow-x: hidden;
     }
 
-    h1 { margin-bottom: 5px; font-size: 1.5rem; }
-    p { color: #aaa; margin-top: 0; font-size: 0.9rem; }
+    h1 { margin-bottom: 5px; font-size: 1.5rem; z-index: 2; }
+    p { color: #aaa; margin-top: 0; font-size: 0.9rem; z-index: 2; }
+
+    /* Outer Character Stickers */
+    .sticker {
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.9;
+    }
+
+    .sticker-left {
+      top: 100px;
+      left: calc(50% - 250px);
+    }
+
+    .sticker-right {
+      top: 120px;
+      right: calc(50% - 250px);
+    }
+
+    @media (max-width: 520px) {
+      .sticker-left { left: 5px; width: 75px; height: 75px; }
+      .sticker-right { right: 5px; width: 75px; height: 75px; }
+    }
 
     .booth-container {
       position: relative;
-      /* Narrow container width */
       width: 280px;
       max-width: 90%;
       background: #1e1e1e;
@@ -29,9 +57,9 @@
       padding: 12px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.5);
       text-align: center;
+      z-index: 2;
     }
 
-    /* Constrained video frame for a narrower photo ratio */
     .video-wrapper {
       width: 100%;
       height: 240px;
@@ -44,8 +72,8 @@
     video {
       width: 100%;
       height: 100%;
-      object-fit: cover; /* Crops stream neatly to fill narrow frame */
-      transform: scaleX(-1); /* Mirror camera output */
+      object-fit: cover;
+      transform: scaleX(-1);
     }
 
     .countdown-overlay {
@@ -87,6 +115,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      z-index: 2;
     }
 
     canvas {
@@ -111,6 +140,37 @@
 </head>
 <body>
 
+  <!-- Outer Background Nailong Character (Left) -->
+  <svg class="sticker sticker-left" viewBox="0 0 100 100">
+    <ellipse cx="50" cy="55" rx="35" ry="38" fill="#FFD700"/>
+    <ellipse cx="50" cy="62" rx="22" ry="24" fill="#FFF8DC"/>
+    <circle cx="36" cy="45" r="5" fill="#000"/>
+    <circle cx="64" cy="45" r="5" fill="#000"/>
+    <circle cx="38" cy="43" r="1.8" fill="#FFF"/>
+    <circle cx="66" cy="43" r="1.8" fill="#FFF"/>
+    <ellipse cx="28" cy="53" rx="4" ry="2.5" fill="#FFA07A"/>
+    <ellipse cx="72" cy="53" rx="4" ry="2.5" fill="#FFA07A"/>
+    <path d="M 42 56 Q 50 63 58 56" stroke="#000" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <polygon points="40,18 45,28 35,28" fill="#FF8C00"/>
+    <polygon points="60,18 65,28 55,28" fill="#FF8C00"/>
+  </svg>
+
+  <!-- Outer Background Cute Rabbit Character (Right) -->
+  <svg class="sticker sticker-right" viewBox="0 0 100 100">
+    <ellipse cx="38" cy="22" rx="7" ry="18" fill="#FFFFFF"/>
+    <ellipse cx="38" cy="22" rx="4" ry="12" fill="#FFB6C1"/>
+    <ellipse cx="62" cy="22" rx="7" ry="18" fill="#FFFFFF"/>
+    <ellipse cx="62" cy="22" rx="4" ry="12" fill="#FFB6C1"/>
+    <ellipse cx="50" cy="60" rx="32" ry="28" fill="#FFFFFF"/>
+    <circle cx="38" cy="55" r="4" fill="#333"/>
+    <circle cx="62" cy="55" r="4" fill="#333"/>
+    <circle cx="39" cy="53" r="1.5" fill="#FFF"/>
+    <circle cx="63" cy="53" r="1.5" fill="#FFF"/>
+    <polygon points="50,62 47,59 53,59" fill="#FFB6C1"/>
+    <ellipse cx="28" cy="62" rx="5" ry="3" fill="#FFB6C1"/>
+    <ellipse cx="72" cy="62" rx="5" ry="3" fill="#FFB6C1"/>
+  </svg>
+
   <h1>SnapStrip Photobooth</h1>
   <p>Take 3 snaps to build your photostrip!</p>
 
@@ -125,7 +185,6 @@
   </div>
 
   <div class="strip-container">
-    <!-- Slim photostrip canvas dimensions (210 x 680) -->
     <canvas id="canvas" width="210" height="680" style="display:none;"></canvas>
     <a id="download-link" class="download-btn" download="photostrip.png">Download Photo Strip</a>
   </div>
@@ -160,7 +219,7 @@
           countdownEl.textContent = "Get Ready!";
           countdownEl.style.fontSize = "1.5rem";
           countdownEl.style.display = 'block';
-          await sleep(1500); // Delay between shots
+          await sleep(1500);
           countdownEl.style.fontSize = "4rem";
         }
 
@@ -171,7 +230,6 @@
         }
         countdownEl.style.display = 'none';
 
-        // Capture frame with narrow proportions (190 x 180)
         const tempCanvas = document.createElement('canvas');
         const targetWidth = 190;
         const targetHeight = 180;
@@ -182,7 +240,6 @@
         tempCtx.translate(tempCanvas.width, 0);
         tempCtx.scale(-1, 1);
 
-        // Crop center of video to fit narrow aspect ratio
         const vWidth = video.videoWidth || 640;
         const vHeight = video.videoHeight || 480;
         const sourceWidth = vHeight * (targetWidth / targetHeight);
@@ -210,10 +267,11 @@
         ctx.drawImage(photoCanvas, 10, yOffset);
       });
 
+      // Bottom Text: ONLY the Date
       ctx.fillStyle = '#111';
       ctx.font = 'bold 12px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('PHOTOBOOTH • ' + new Date().toLocaleDateString(), canvas.width / 2, 655);
+      ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, 655);
 
       canvas.style.display = 'block';
       downloadLink.href = canvas.toDataURL('image/png');
