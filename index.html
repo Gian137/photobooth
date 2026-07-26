@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VS Code Photobooth</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      margin: 0;
+    }
+
+    h1 { margin-bottom: 5px; }
+    p { color: #aaa; margin-top: 0; }
+
+    .booth-container {
+      position: relative;
+      width: 480px;
+      max-width: 100%;
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+
+    video {
+      width: 100%;
+      border-radius: 8px;
+      transform: scaleX(-1); /* Mirror camera output */
+      background: #000;
+    }
+
+    .countdown-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 5rem;
+      font-weight: bold;
+      color: #00ffcc;
+      text-shadow: 0 0 10px rgba(0,0,0,0.8);
+      display: none;
+    }
+
+    .controls {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    button {
+      background: #007acc;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    button:hover { background: #005999; }
+    button:disabled { background: #444; cursor: not-allowed; }
+
+    .strip-container {
+      margin-top: 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    canvas {
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      max-width: 100%;
+    }
+
+    .download-btn {
+      margin-top: 12px;
+      background: #28a745;
+      display: none;
+      text-decoration: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 6px;
+    }
+
+    .download-btn:hover { background: #218838; }
+  </style>
+</head>
+<body>
+
+  <h1>SnapStrip Photobooth</h1>
+  <p>Take 3 snaps to build your photostrip!</p>
+
+  <div class="booth-container">
+    <video id="video" autoplay playsinline></video>
+    <div id="countdown" class="countdown-overlay">3</div>
+    <div class="controls">
+      <button id="snap-btn" onclick="startPhotoStrip()">Take Photos (3x)</button>
+    </div>
+  </div>
+
+  <div class="strip-container">
+    <canvas id="canvas" width="300" height="820" style="display:none;"></canvas>
+    <a id="download-link" class="download-btn" download="photostrip.png">Download Photo Strip</a>
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    const countdownEl = document.getElementById('countdown');
+    const snapBtn = document.getElementById('snap-btn');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const downloadLink = document.getElementById('download-link');
+
+    // Access the user's webcam
+    async function initCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+      } catch (err) {
+        alert("Camera access denied or not found!");
+      }
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function startPhotoStrip() {
+      snapBtn.disabled = true;
+      const photos = [];
+
+      // Take 3 pictures with countdown
+      for (let i = 0; i < 3; i++) {
+        for (let c = 3; c > 0; c--) {
+          countdownEl.textContent = c;
+          countdownEl.style.display = 'block';
+          await sleep(800);
+        }
+        countdownEl.style.display = 'none';
+
+        // Capture frame
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = 280;
+        tempCanvas.height = 210;
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // Draw mirrored image to temporary canvas
+        tempCtx.translate(tempCanvas.width, 0);
+        tempCtx.scale(-1, 1);
+        tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+        
+        photos.push(tempCanvas);
+        await sleep(500); // Brief pause between shots
+      }
+
+      renderPhotostrip(photos);
+      snapBtn.disabled = false;
+    }
+
+    function renderPhotostrip(photos) {
+      // Background strip styling
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw each snapshot onto the photostrip canvas
+      photos.forEach((photoCanvas, index) => {
+        const yOffset = 15 + (index * 225); // Vertical spacing
+        ctx.drawImage(photoCanvas, 10, yOffset);
+      });
+
+      // Add simple branding at the bottom
+      ctx.fillStyle = '#111';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('PHOTOBOOTH • ' + new Date().toLocaleDateString(), canvas.width / 2, 780);
+
+      // Display results and enable download
+      canvas.style.display = 'block';
+      downloadLink.href = canvas.toDataURL('image/png');
+      downloadLink.style.display = 'inline-block';
+    }
+
+    // Start video on load
+    initCamera();
+  </script>
+</body>
+</html>
