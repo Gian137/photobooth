@@ -155,12 +155,12 @@
     <div id="theme-selector" class="theme-selector">
       <label for="frame-theme">Choose Frame Style:</label>
       <select id="frame-theme" onchange="changeTheme()">
-        <option value="newspaper">Newspaper Press (Vintage Times)</option>
+        <option value="moonlight">Moonlight Night (Under The Stars)</option>
+        <option value="beach">Sunny Beach (Summer Party)</option>
+        <option value="vintage">Vintage Sepia (Film Strip)</option>
         <option value="white">Classic White (Nailong & Rabbit)</option>
+        <option value="newspaper">Newspaper Press (Vintage Times)</option>
         <option value="checkered">Checkered Pink (Y2K Hearts)</option>
-        <option value="vintage">Vintage Sepia (Floral)</option>
-        <option value="beach">Sunny Beach (Tropical)</option>
-        <option value="moonlight">Moonlight Night (Starry)</option>
       </select>
     </div>
 
@@ -214,7 +214,7 @@
 
         const tempCanvas = document.createElement('canvas');
         const targetWidth = 400;
-        const targetHeight = 260; // Landscape ratio to fill frame box
+        const targetHeight = 260; 
         tempCanvas.width = targetWidth;
         tempCanvas.height = targetHeight;
         const tempCtx = tempCanvas.getContext('2d');
@@ -225,7 +225,6 @@
         const vWidth = video.videoWidth || 640;
         const vHeight = video.videoHeight || 480;
 
-        // Calculate aspect fill crop (center cropping)
         const targetAspect = targetWidth / targetHeight;
         const videoAspect = vWidth / vHeight;
 
@@ -269,10 +268,64 @@
 
     function drawFrameBackground(theme) {
       switch (theme) {
+        case 'moonlight':
+          // Deep Starry Blue Gradient
+          const moonGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+          moonGrad.addColorStop(0, '#0a1128');
+          moonGrad.addColorStop(0.5, '#1c2541');
+          moonGrad.addColorStop(1, '#0b132b');
+          ctx.fillStyle = moonGrad;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // Star dots
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+          for (let i = 0; i < 45; i++) {
+            const rx = (Math.sin(i * 99) * 0.5 + 0.5) * canvas.width;
+            const ry = (Math.cos(i * 33) * 0.5 + 0.5) * canvas.height;
+            const rSize = (i % 3 === 0) ? 1.8 : 1;
+            ctx.beginPath();
+            ctx.arc(rx, ry, rSize, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          break;
+
+        case 'beach':
+          // Summer Party White Base
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // Subtle Summer Border Doodles
+          ctx.font = '12px sans-serif';
+          ctx.fillText('🍍', 8, 25);
+          ctx.fillText('🌴', canvas.width - 20, 25);
+          ctx.fillText('🥥', 8, canvas.height - 25);
+          ctx.fillText('🌺', canvas.width - 22, canvas.height - 25);
+          break;
+
+        case 'vintage':
+          // Film Strip Vintage Gray Outer Background
+          ctx.fillStyle = '#a3a89e';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // Black Central Film Reel
+          const filmX = 20;
+          const filmWidth = canvas.width - 40;
+          ctx.fillStyle = '#111111';
+          ctx.fillRect(filmX, 0, filmWidth, canvas.height);
+
+          // Film Sprocket Holes (Left & Right perforations)
+          ctx.fillStyle = '#a3a89e';
+          for (let y = 10; y < canvas.height; y += 18) {
+            // Left Sprockets
+            ctx.fillRect(filmX + 6, y, 7, 10);
+            // Right Sprockets
+            ctx.fillRect(filmX + filmWidth - 13, y, 7, 10);
+          }
+          break;
+
         case 'newspaper':
           ctx.fillStyle = '#e8e4d9';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
-          
           ctx.strokeStyle = '#222';
           ctx.lineWidth = 3;
           ctx.strokeRect(4, 4, canvas.width - 8, canvas.height - 8);
@@ -284,10 +337,8 @@
 
           ctx.lineWidth = 1;
           ctx.beginPath(); ctx.moveTo(15, 38); ctx.lineTo(canvas.width - 15, 38); ctx.stroke();
-          
           ctx.font = 'italic 8.5px "Times New Roman", serif';
           ctx.fillText(`VOL. I ... NO. 1      ${new Date().toLocaleDateString().toUpperCase()}      SPECIAL EDITION`, canvas.width / 2, 47);
-          
           ctx.beginPath(); ctx.moveTo(15, 52); ctx.lineTo(canvas.width - 15, 52); ctx.stroke();
           break;
 
@@ -295,31 +346,6 @@
           drawCheckeredPattern('#1e1e1e', '#ffb6c1', 12);
           ctx.fillStyle = 'rgba(20, 20, 20, 0.85)';
           ctx.fillRect(10, 5, canvas.width - 20, canvas.height - 10);
-          break;
-
-        case 'vintage':
-          ctx.fillStyle = '#f4e4bc';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.strokeStyle = '#8b5a2b';
-          ctx.lineWidth = 4;
-          ctx.strokeRect(6, 6, canvas.width - 12, canvas.height - 12);
-          break;
-
-        case 'beach':
-          const beachGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-          beachGrad.addColorStop(0, '#87ceeb');
-          beachGrad.addColorStop(0.5, '#20b2aa');
-          beachGrad.addColorStop(1, '#f4a460');
-          ctx.fillStyle = beachGrad;
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          break;
-
-        case 'moonlight':
-          const moonGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-          moonGrad.addColorStop(0, '#0b1d3a');
-          moonGrad.addColorStop(1, '#2a085c');
-          ctx.fillStyle = moonGrad;
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
           break;
 
         case 'white':
@@ -438,6 +464,22 @@
       ];
 
       switch (theme) {
+        case 'moonlight':
+          ctx.font = '14px sans-serif';
+          const moonEmojis = ['🌙', '⭐', '✨', '💫', '🌌', '⭐'];
+          positionsY.forEach((y, i) => {
+            ctx.fillText(moonEmojis[i % moonEmojis.length], (i % 2 === 0 ? leftX : rightX), y);
+          });
+          break;
+
+        case 'beach':
+          ctx.font = '14px sans-serif';
+          const beachEmojis = ['☀️', '🌴', '🌊', '🍹', '🐚', '🌺'];
+          positionsY.forEach((y, i) => {
+            ctx.fillText(beachEmojis[i % beachEmojis.length], (i % 2 === 0 ? leftX : rightX), y);
+          });
+          break;
+
         case 'newspaper':
           ctx.fillStyle = '#222222';
           ctx.font = '12px "Times New Roman", serif';
@@ -456,32 +498,26 @@
           break;
 
         case 'vintage':
-          ctx.fillStyle = '#8b5a2b';
-          ctx.font = '13px serif';
-          const vintageSymbols = ['✿', '♦', '❀', '♦', '✿', '❀'];
-          positionsY.forEach((y, i) => {
-            ctx.fillText(vintageSymbols[i % vintageSymbols.length], (i % 2 === 0 ? leftX : rightX), y);
-          });
-          break;
-
-        case 'beach':
-          ctx.font = '14px sans-serif';
-          const beachEmojis = ['☀️', '🌴', '🌊', '🍹', '🐚', '🌺'];
-          positionsY.forEach((y, i) => {
-            ctx.fillText(beachEmojis[i % beachEmojis.length], (i % 2 === 0 ? leftX : rightX), y);
-          });
-          break;
-
-        case 'moonlight':
-          ctx.font = '14px sans-serif';
-          const moonEmojis = ['🌙', '⭐', '✨', '💫', '🌌', '⭐'];
-          positionsY.forEach((y, i) => {
-            ctx.fillText(moonEmojis[i % moonEmojis.length], (i % 2 === 0 ? leftX : rightX), y);
-          });
+          // Film strip uses perforated sprocket holes on sides instead of side emojis
           break;
       }
 
       ctx.restore();
+    }
+
+    // Rounded rectangle helper for Film Strip theme
+    function drawRoundedRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
     }
 
     function renderPhotostrip() {
@@ -490,10 +526,17 @@
       ctx.restore();
       drawFrameBackground(selectedTheme);
 
-      const sideMargin = 25;
-      const footerMargin = 35;
-      const topHeaderOffset = (selectedTheme === 'newspaper') ? 60 : 18;
-      const photoGap = 12;
+      let sideMargin = 25;
+      let footerMargin = 65;
+      let topHeaderOffset = (selectedTheme === 'newspaper') ? 60 : 18;
+      let photoGap = 12;
+
+      if (selectedTheme === 'vintage') {
+        sideMargin = 40; // Indent inside film black track
+        topHeaderOffset = 22;
+        footerMargin = 30;
+        photoGap = 16;
+      }
 
       const photoWidth = canvas.width - (sideMargin * 2);
       const totalAvailableHeight = canvas.height - topHeaderOffset - footerMargin;
@@ -503,14 +546,31 @@
         const yOffset = topHeaderOffset + (index * (photoHeight + photoGap));
         
         ctx.save();
-        ctx.strokeStyle = (selectedTheme === 'newspaper') ? '#222' : 'rgba(0,0,0,0.18)';
-        ctx.lineWidth = (selectedTheme === 'newspaper') ? 2 : 1;
-        ctx.strokeRect(sideMargin - 1, yOffset - 1, photoWidth + 2, photoHeight + 2);
 
-        if (selectedTheme === 'newspaper') {
+        if (selectedTheme === 'moonlight') {
+          // Shiny Gold Photo Borders
+          ctx.strokeStyle = '#d4af37';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(sideMargin - 1, yOffset - 1, photoWidth + 2, photoHeight + 2);
+        } else if (selectedTheme === 'beach') {
+          // Yellow-Gold Summer Photo Frame
+          ctx.strokeStyle = '#f4c430';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(sideMargin - 1, yOffset - 1, photoWidth + 2, photoHeight + 2);
+        } else if (selectedTheme === 'vintage') {
+          // Clip photos with rounded film corners
+          drawRoundedRect(ctx, sideMargin, yOffset, photoWidth, photoHeight, 8);
+          ctx.clip();
+          ctx.filter = 'sepia(60%) contrast(105%)';
+        } else if (selectedTheme === 'newspaper') {
+          ctx.strokeStyle = '#222';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(sideMargin - 1, yOffset - 1, photoWidth + 2, photoHeight + 2);
           ctx.filter = 'grayscale(100%) contrast(110%)';
         } else {
-          ctx.filter = 'none';
+          ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(sideMargin - 1, yOffset - 1, photoWidth + 2, photoHeight + 2);
         }
 
         ctx.drawImage(photoCanvas, sideMargin, yOffset, photoWidth, photoHeight);
@@ -519,15 +579,57 @@
 
       drawSideDecorations(selectedTheme, topHeaderOffset, photoHeight, photoGap);
 
-      ctx.fillStyle = (selectedTheme === 'moonlight' || selectedTheme === 'checkered') ? '#ffffff' : '#111111';
-      ctx.font = 'bold 11px "Times New Roman", Georgia, serif';
-      ctx.textAlign = 'center';
-      
-      if (selectedTheme === 'newspaper') {
+      // Theme-Specific Footer Titles & Formatting
+      if (selectedTheme === 'moonlight') {
+        ctx.save();
+        ctx.fillStyle = '#f3e5ab';
+        ctx.font = 'italic bold 15px "Georgia", serif';
+        ctx.textAlign = 'center';
+        ctx.fillText("A Night Under The Stars", canvas.width / 2, canvas.height - 35);
+        
+        ctx.font = 'bold 10px "Segoe UI", sans-serif';
+        ctx.fillStyle = '#d4af37';
+        ctx.fillText("PROM " + new Date().getFullYear(), canvas.width / 2, canvas.height - 18);
+        
+        // Crescent Moon Graphic
+        ctx.fillStyle = '#f3e5ab';
+        ctx.beginPath();
+        ctx.arc(35, canvas.height - 32, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#1c2541';
+        ctx.beginPath();
+        ctx.arc(39, canvas.height - 34, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+      } else if (selectedTheme === 'beach') {
+        ctx.save();
+        ctx.fillStyle = '#008080';
+        ctx.font = '900 20px "Impact", "Arial Black", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText("SUMMER PARTY", canvas.width / 2, canvas.height - 32);
+        
+        ctx.font = 'bold 9px sans-serif';
+        ctx.fillStyle = '#888888';
+        ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, canvas.height - 15);
+        ctx.restore();
+
+      } else if (selectedTheme === 'newspaper') {
+        ctx.fillStyle = '#111111';
+        ctx.font = 'bold 11px "Times New Roman", Georgia, serif';
+        ctx.textAlign = 'center';
         ctx.fillText("• PHOTOSTRIP ARCHIVE EDITION •", canvas.width / 2, canvas.height - 14);
+
       } else if (selectedTheme === 'checkered') {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 11px "Times New Roman", Georgia, serif';
+        ctx.textAlign = 'center';
         ctx.fillText("YOUNG & SHINE • " + new Date().toLocaleDateString(), canvas.width / 2, canvas.height - 14);
-      } else {
+
+      } else if (selectedTheme !== 'vintage') {
+        ctx.fillStyle = '#111111';
+        ctx.font = 'bold 11px "Times New Roman", Georgia, serif';
+        ctx.textAlign = 'center';
         ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, canvas.height - 14);
       }
 
