@@ -155,6 +155,8 @@
     <div id="theme-selector" class="theme-selector">
       <label for="frame-theme">Choose Frame Style:</label>
       <select id="frame-theme" onchange="changeTheme()">
+        <option value="blue">Classic Blue Shade</option>
+        <option value="red">Classic Red Shade</option>
         <option value="moonlight">Moonlight Night (Under The Stars)</option>
         <option value="beach">Sunny Beach (Summer Party)</option>
         <option value="vintage">Vintage Sepia (Film Strip)</option>
@@ -268,8 +270,19 @@
 
     function drawFrameBackground(theme) {
       switch (theme) {
+        case 'blue':
+          // Pure Shade of Blue
+          ctx.fillStyle = '#1d3557';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          break;
+
+        case 'red':
+          // Pure Shade of Red
+          ctx.fillStyle = '#8b0000';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          break;
+
         case 'moonlight':
-          // Deep Starry Blue Gradient
           const moonGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
           moonGrad.addColorStop(0, '#0a1128');
           moonGrad.addColorStop(0.5, '#1c2541');
@@ -277,7 +290,6 @@
           ctx.fillStyle = moonGrad;
           ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-          // Star dots
           ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
           for (let i = 0; i < 45; i++) {
             const rx = (Math.sin(i * 99) * 0.5 + 0.5) * canvas.width;
@@ -290,11 +302,9 @@
           break;
 
         case 'beach':
-          // Summer Party White Base
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-          // Subtle Summer Border Doodles
           ctx.font = '12px sans-serif';
           ctx.fillText('🍍', 8, 25);
           ctx.fillText('🌴', canvas.width - 20, 25);
@@ -303,22 +313,17 @@
           break;
 
         case 'vintage':
-          // Film Strip Vintage Gray Outer Background
           ctx.fillStyle = '#a3a89e';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-          // Black Central Film Reel
           const filmX = 20;
           const filmWidth = canvas.width - 40;
           ctx.fillStyle = '#111111';
           ctx.fillRect(filmX, 0, filmWidth, canvas.height);
 
-          // Film Sprocket Holes (Left & Right perforations)
           ctx.fillStyle = '#a3a89e';
           for (let y = 10; y < canvas.height; y += 18) {
-            // Left Sprockets
             ctx.fillRect(filmX + 6, y, 7, 10);
-            // Right Sprockets
             ctx.fillRect(filmX + filmWidth - 13, y, 7, 10);
           }
           break;
@@ -464,6 +469,22 @@
       ];
 
       switch (theme) {
+        case 'blue':
+          ctx.font = '14px sans-serif';
+          const blueEmojis = ['💙', '✨', '🌊', '❄️', '💎', '✨'];
+          positionsY.forEach((y, i) => {
+            ctx.fillText(blueEmojis[i % blueEmojis.length], (i % 2 === 0 ? leftX : rightX), y);
+          });
+          break;
+
+        case 'red':
+          ctx.font = '14px sans-serif';
+          const redEmojis = ['❤️', '✨', '🌹', '🔥', '🍷', '✨'];
+          positionsY.forEach((y, i) => {
+            ctx.fillText(redEmojis[i % redEmojis.length], (i % 2 === 0 ? leftX : rightX), y);
+          });
+          break;
+
         case 'moonlight':
           ctx.font = '14px sans-serif';
           const moonEmojis = ['🌙', '⭐', '✨', '💫', '🌌', '⭐'];
@@ -498,14 +519,12 @@
           break;
 
         case 'vintage':
-          // Film strip uses perforated sprocket holes on sides instead of side emojis
           break;
       }
 
       ctx.restore();
     }
 
-    // Rounded rectangle helper for Film Strip theme
     function drawRoundedRect(ctx, x, y, width, height, radius) {
       ctx.beginPath();
       ctx.moveTo(x + radius, y);
@@ -532,7 +551,7 @@
       let photoGap = 12;
 
       if (selectedTheme === 'vintage') {
-        sideMargin = 40; // Indent inside film black track
+        sideMargin = 40;
         topHeaderOffset = 22;
         footerMargin = 30;
         photoGap = 16;
@@ -547,18 +566,23 @@
         
         ctx.save();
 
-        if (selectedTheme === 'moonlight') {
-          // Shiny Gold Photo Borders
+        if (selectedTheme === 'blue') {
+          ctx.strokeStyle = '#a8dadc';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(sideMargin - 1, yOffset - 1, photoWidth + 2, photoHeight + 2);
+        } else if (selectedTheme === 'red') {
+          ctx.strokeStyle = '#ff8a8a';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(sideMargin - 1, yOffset - 1, photoWidth + 2, photoHeight + 2);
+        } else if (selectedTheme === 'moonlight') {
           ctx.strokeStyle = '#d4af37';
           ctx.lineWidth = 3;
           ctx.strokeRect(sideMargin - 1, yOffset - 1, photoWidth + 2, photoHeight + 2);
         } else if (selectedTheme === 'beach') {
-          // Yellow-Gold Summer Photo Frame
           ctx.strokeStyle = '#f4c430';
           ctx.lineWidth = 2;
           ctx.strokeRect(sideMargin - 1, yOffset - 1, photoWidth + 2, photoHeight + 2);
         } else if (selectedTheme === 'vintage') {
-          // Clip photos with rounded film corners
           drawRoundedRect(ctx, sideMargin, yOffset, photoWidth, photoHeight, 8);
           ctx.clip();
           ctx.filter = 'sepia(60%) contrast(105%)';
@@ -579,8 +603,13 @@
 
       drawSideDecorations(selectedTheme, topHeaderOffset, photoHeight, photoGap);
 
-      // Theme-Specific Footer Titles & Formatting
-      if (selectedTheme === 'moonlight') {
+      if (selectedTheme === 'blue' || selectedTheme === 'red') {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 11px "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, canvas.height - 18);
+
+      } else if (selectedTheme === 'moonlight') {
         ctx.save();
         ctx.fillStyle = '#f3e5ab';
         ctx.font = 'italic bold 15px "Georgia", serif';
@@ -591,7 +620,6 @@
         ctx.fillStyle = '#d4af37';
         ctx.fillText("PROM " + new Date().getFullYear(), canvas.width / 2, canvas.height - 18);
         
-        // Crescent Moon Graphic
         ctx.fillStyle = '#f3e5ab';
         ctx.beginPath();
         ctx.arc(35, canvas.height - 32, 12, 0, Math.PI * 2);
