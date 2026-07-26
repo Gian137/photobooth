@@ -150,17 +150,17 @@
   </div>
 
   <div class="strip-container">
-    <canvas id="canvas" width="260" height="580" style="display:none;"></canvas>
+    <canvas id="canvas" width="270" height="580" style="display:none;"></canvas>
     
     <div id="theme-selector" class="theme-selector">
       <label for="frame-theme">Choose Frame Style:</label>
       <select id="frame-theme" onchange="changeTheme()">
         <option value="newspaper">Newspaper Press (Vintage Times)</option>
-        <option value="white">Classic White</option>
-        <option value="checkered">Checkered Pink (Y2K)</option>
-        <option value="vintage">Vintage Sepia</option>
-        <option value="beach">Sunny Beach</option>
-        <option value="moonlight">Moonlight Night</option>
+        <option value="white">Classic White (Clean)</option>
+        <option value="checkered">Checkered Pink (Y2K Hearts)</option>
+        <option value="vintage">Vintage Sepia (Floral)</option>
+        <option value="beach">Sunny Beach (Tropical)</option>
+        <option value="moonlight">Moonlight Night (Starry)</option>
       </select>
     </div>
 
@@ -213,8 +213,8 @@
         countdownEl.style.display = 'none';
 
         const tempCanvas = document.createElement('canvas');
-        const targetWidth = 210;
-        const targetHeight = 140;
+        const targetWidth = 300;
+        const targetHeight = 200;
         tempCanvas.width = targetWidth;
         tempCanvas.height = targetHeight;
         const tempCtx = tempCanvas.getContext('2d');
@@ -258,26 +258,22 @@
     function drawFrameBackground(theme) {
       switch (theme) {
         case 'newspaper':
-          // Aged Newspaper off-white background
           ctx.fillStyle = '#e8e4d9';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           
-          // Outer black border
           ctx.strokeStyle = '#222';
           ctx.lineWidth = 3;
           ctx.strokeRect(4, 4, canvas.width - 8, canvas.height - 8);
 
-          // Header Text (The Daily Times)
           ctx.fillStyle = '#111';
           ctx.font = 'bold 22px "Times New Roman", Georgia, serif';
           ctx.textAlign = 'center';
           ctx.fillText("The Daily Times", canvas.width / 2, 32);
 
-          // Top divider lines & Date banner
           ctx.lineWidth = 1;
           ctx.beginPath(); ctx.moveTo(15, 38); ctx.lineTo(canvas.width - 15, 38); ctx.stroke();
           
-          ctx.font = 'italic 9px "Times New Roman", serif';
+          ctx.font = 'italic 8.5px "Times New Roman", serif';
           ctx.fillText(`VOL. I ... NO. 1      ${new Date().toLocaleDateString().toUpperCase()}      SPECIAL EDITION`, canvas.width / 2, 47);
           
           ctx.beginPath(); ctx.moveTo(15, 52); ctx.lineTo(canvas.width - 15, 52); ctx.stroke();
@@ -322,80 +318,70 @@
       }
     }
 
-    // Character Renderers
-    function drawNailong(x, y, size, angleDegrees, emotion = 'happy') {
+    // Dynamic Side Decorators Generator
+    function drawSideDecorations(theme, topOffset, photoHeight, photoGap) {
+      if (theme === 'white') return; // White theme is kept clean with no side emojis
+
       ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate((angleDegrees * Math.PI) / 180);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
 
-      ctx.fillStyle = '#FFD700';
-      ctx.beginPath(); ctx.ellipse(0, 0, size * 0.35, size * 0.38, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#FFF8DC';
-      ctx.beginPath(); ctx.ellipse(0, size * 0.08, size * 0.22, size * 0.24, 0, 0, Math.PI * 2); ctx.fill();
+      const leftX = 12;
+      const rightX = canvas.width - 12;
 
-      ctx.fillStyle = '#FFA07A';
-      ctx.beginPath(); ctx.ellipse(-size * 0.22, -size * 0.02, size * 0.05, size * 0.03, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(size * 0.22, -size * 0.02, size * 0.05, size * 0.03, 0, 0, Math.PI * 2); ctx.fill();
+      // Positions along the side of the 3 photos
+      const positionsY = [
+        topOffset + (photoHeight * 0.25),
+        topOffset + (photoHeight * 0.75),
+        topOffset + photoHeight + photoGap + (photoHeight * 0.25),
+        topOffset + photoHeight + photoGap + (photoHeight * 0.75),
+        topOffset + (photoHeight * 2) + (photoGap * 2) + (photoHeight * 0.25),
+        topOffset + (photoHeight * 2) + (photoGap * 2) + (photoHeight * 0.75)
+      ];
 
-      ctx.fillStyle = '#000';
-      if (emotion === 'surprised') {
-        ctx.beginPath(); ctx.arc(-size * 0.14, -size * 0.12, size * 0.06, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(size * 0.14, -size * 0.12, size * 0.06, 0, Math.PI * 2); ctx.fill();
-      } else if (emotion === 'wink') {
-        ctx.beginPath(); ctx.arc(-size * 0.14, -size * 0.12, size * 0.05, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.arc(size * 0.14, -size * 0.12, size * 0.04, 0.2 * Math.PI, 0.8 * Math.PI); ctx.stroke();
-      } else {
-        ctx.beginPath(); ctx.arc(-size * 0.14, -size * 0.12, size * 0.05, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(size * 0.14, -size * 0.12, size * 0.05, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#FFF';
-        ctx.beginPath(); ctx.arc(-size * 0.12, -size * 0.14, size * 0.018, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(size * 0.16, -size * 0.14, size * 0.018, 0, Math.PI * 2); ctx.fill();
+      switch (theme) {
+        case 'newspaper':
+          ctx.fillStyle = '#222222';
+          ctx.font = '12px "Times New Roman", serif';
+          const newsSymbols = ['★', '❖', '✦', '❖', '★', '✦'];
+          positionsY.forEach((y, i) => {
+            ctx.fillText(newsSymbols[i % newsSymbols.length], (i % 2 === 0 ? leftX : rightX), y);
+          });
+          break;
+
+        case 'checkered':
+          ctx.font = '14px sans-serif';
+          const y2kEmojis = ['💖', '✨', '🎀', '⭐', '💗', '✨'];
+          positionsY.forEach((y, i) => {
+            ctx.fillText(y2kEmojis[i % y2kEmojis.length], (i % 2 === 0 ? leftX : rightX), y);
+          });
+          break;
+
+        case 'vintage':
+          ctx.fillStyle = '#8b5a2b';
+          ctx.font = '13px serif';
+          const vintageSymbols = ['✿', '♦', '❀', '♦', '✿', '❀'];
+          positionsY.forEach((y, i) => {
+            ctx.fillText(vintageSymbols[i % vintageSymbols.length], (i % 2 === 0 ? leftX : rightX), y);
+          });
+          break;
+
+        case 'beach':
+          ctx.font = '14px sans-serif';
+          const beachEmojis = ['☀️', '🌴', '🌊', '🍹', '🐚', '🌺'];
+          positionsY.forEach((y, i) => {
+            ctx.fillText(beachEmojis[i % beachEmojis.length], (i % 2 === 0 ? leftX : rightX), y);
+          });
+          break;
+
+        case 'moonlight':
+          ctx.font = '14px sans-serif';
+          const moonEmojis = ['🌙', '⭐', '✨', '💫', '🌌', '⭐'];
+          positionsY.forEach((y, i) => {
+            ctx.fillText(moonEmojis[i % moonEmojis.length], (i % 2 === 0 ? leftX : rightX), y);
+          });
+          break;
       }
-
-      ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
-      if (emotion === 'surprised') {
-        ctx.fillStyle = '#D32F2F';
-        ctx.beginPath(); ctx.arc(0, size * 0.03, size * 0.05, 0, Math.PI * 2); ctx.fill();
-      } else if (emotion === 'excited') {
-        ctx.fillStyle = '#D32F2F';
-        ctx.beginPath(); ctx.arc(0, -size * 0.01, size * 0.08, 0, Math.PI); ctx.fill();
-      } else {
-        ctx.beginPath(); ctx.arc(0, -size * 0.01, size * 0.08, 0.1 * Math.PI, 0.9 * Math.PI); ctx.stroke();
-      }
-
-      ctx.fillStyle = '#FF8C00';
-      ctx.beginPath(); ctx.moveTo(-size * 0.15, -size * 0.32); ctx.lineTo(-size * 0.08, -size * 0.45); ctx.lineTo(-size * 0.02, -size * 0.32); ctx.fill();
-      ctx.beginPath(); ctx.moveTo(size * 0.02, -size * 0.32); ctx.lineTo(size * 0.08, -size * 0.45); ctx.lineTo(size * 0.15, -size * 0.32); ctx.fill();
-
-      ctx.restore();
-    }
-
-    function drawRabbit(x, y, size, angleDegrees) {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate((angleDegrees * Math.PI) / 180);
-
-      ctx.fillStyle = '#FFFFFF';
-      ctx.beginPath(); ctx.ellipse(-size * 0.12, -size * 0.38, size * 0.07, size * 0.18, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(size * 0.12, -size * 0.38, size * 0.07, size * 0.18, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#FFB6C1';
-      ctx.beginPath(); ctx.ellipse(-size * 0.12, -size * 0.38, size * 0.04, size * 0.12, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(size * 0.12, -size * 0.38, size * 0.04, size * 0.12, 0, 0, Math.PI * 2); ctx.fill();
-
-      ctx.fillStyle = '#FFFFFF';
-      ctx.beginPath(); ctx.ellipse(0, 0, size * 0.32, size * 0.28, 0, 0, Math.PI * 2); ctx.fill();
-
-      ctx.fillStyle = '#333';
-      ctx.beginPath(); ctx.arc(-size * 0.12, -size * 0.05, size * 0.04, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(size * 0.12, -size * 0.05, size * 0.04, 0, Math.PI * 2); ctx.fill();
-
-      ctx.fillStyle = '#FFB6C1';
-      ctx.beginPath(); ctx.ellipse(-size * 0.22, size * 0.02, size * 0.05, size * 0.03, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(size * 0.22, size * 0.02, size * 0.05, size * 0.03, 0, 0, Math.PI * 2); ctx.fill();
-
-      ctx.fillStyle = '#FFB6C1';
-      ctx.beginPath(); ctx.arc(0, 0, size * 0.03, 0, Math.PI * 2); ctx.fill();
 
       ctx.restore();
     }
@@ -407,61 +393,53 @@
       ctx.restore();
       drawFrameBackground(selectedTheme);
 
-      // Determine Y start position depending on header space
-      const topOffset = selectedTheme === 'newspaper' ? 62 : 18;
-      const photoWidth = 210;
-      const photoHeight = 145;
-      const photoX = 25;
+      // Canvas dimensions and bounds calculation
+      const sideMargin = 25;
+      const footerMargin = 35;
+      const topHeaderOffset = (selectedTheme === 'newspaper') ? 60 : 18;
+      const photoGap = 12;
 
+      const photoWidth = canvas.width - (sideMargin * 2);
+      const totalAvailableHeight = canvas.height - topHeaderOffset - footerMargin;
+      const photoHeight = Math.floor((totalAvailableHeight - (photoGap * 2)) / 3);
+
+      // Render 3 Photos
       currentPhotos.forEach((photoCanvas, index) => {
-        const yOffset = topOffset + (index * (photoHeight + 12));
+        const yOffset = topHeaderOffset + (index * (photoHeight + photoGap));
         
         ctx.save();
-        // Photo outline border
-        ctx.strokeStyle = (selectedTheme === 'newspaper') ? '#222' : 'rgba(0,0,0,0.15)';
+        ctx.strokeStyle = (selectedTheme === 'newspaper') ? '#222' : 'rgba(0,0,0,0.18)';
         ctx.lineWidth = (selectedTheme === 'newspaper') ? 2 : 1;
-        ctx.strokeRect(photoX - 1, yOffset - 1, photoWidth + 2, photoHeight + 2);
+        ctx.strokeRect(sideMargin - 1, yOffset - 1, photoWidth + 2, photoHeight + 2);
 
-        // Apply Grayscale Filter for Newspaper style
+        // Apply Newspaper Grayscale Filter
         if (selectedTheme === 'newspaper') {
           ctx.filter = 'grayscale(100%) contrast(110%)';
         } else {
           ctx.filter = 'none';
         }
 
-        // Draw photo fitted perfectly to frame
-        ctx.drawImage(photoCanvas, photoX, yOffset, photoWidth, photoHeight);
+        ctx.drawImage(photoCanvas, sideMargin, yOffset, photoWidth, photoHeight);
         ctx.restore();
       });
 
-      // Draw Side Characters
-      const cLeftX = 12;
-      const cRightX = 248;
+      // Render Dynamic Side Emojis / Decorators based on theme
+      drawSideDecorations(selectedTheme, topHeaderOffset, photoHeight, photoGap);
 
-      drawNailong(cLeftX, topOffset + 30, 24, -20, 'happy');
-      drawRabbit(cLeftX, topOffset + 180, 24, 15);
-      drawNailong(cLeftX, topOffset + 320, 24, -15, 'surprised');
-      drawRabbit(cLeftX, topOffset + 440, 24, 20);
-
-      drawRabbit(cRightX, topOffset + 60, 24, 20);
-      drawNailong(cRightX, topOffset + 210, 24, -20, 'wink');
-      drawRabbit(cRightX, topOffset + 350, 24, 15);
-      drawNailong(cRightX, topOffset + 460, 24, -10, 'excited');
-
-      // Bottom Footer Line
+      // Bottom Footer Text
       ctx.fillStyle = (selectedTheme === 'moonlight' || selectedTheme === 'checkered') ? '#ffffff' : '#111111';
-      ctx.font = 'bold 11px "Times New Roman", serif';
+      ctx.font = 'bold 11px "Times New Roman", Georgia, serif';
       ctx.textAlign = 'center';
       
       if (selectedTheme === 'newspaper') {
-        ctx.fillText("• PHOTOSTRIP ARCHIVE EDITION •", canvas.width / 2, canvas.height - 15);
+        ctx.fillText("• PHOTOSTRIP ARCHIVE EDITION •", canvas.width / 2, canvas.height - 14);
       } else if (selectedTheme === 'checkered') {
-        ctx.fillText("YOUNG & SHINE • " + new Date().toLocaleDateString(), canvas.width / 2, canvas.height - 15);
+        ctx.fillText("YOUNG & SHINE • " + new Date().toLocaleDateString(), canvas.width / 2, canvas.height - 14);
       } else {
-        ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, canvas.height - 15);
+        ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, canvas.height - 14);
       }
 
-      // Display & Download setup
+      // Display controls & update download link
       canvas.style.display = 'block';
       themeSelector.style.display = 'flex';
       downloadLink.href = canvas.toDataURL('image/png');
