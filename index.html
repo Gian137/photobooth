@@ -156,7 +156,7 @@
       <label for="frame-theme">Choose Frame Style:</label>
       <select id="frame-theme" onchange="changeTheme()">
         <option value="newspaper">Newspaper Press (Vintage Times)</option>
-        <option value="white">Classic White (Clean)</option>
+        <option value="white">Classic White (Nailong & Rabbit)</option>
         <option value="checkered">Checkered Pink (Y2K Hearts)</option>
         <option value="vintage">Vintage Sepia (Floral)</option>
         <option value="beach">Sunny Beach (Tropical)</option>
@@ -213,8 +213,8 @@
         countdownEl.style.display = 'none';
 
         const tempCanvas = document.createElement('canvas');
-        const targetWidth = 300;
-        const targetHeight = 200;
+        const targetWidth = 400;
+        const targetHeight = 260; // Landscape ratio to fill frame box
         tempCanvas.width = targetWidth;
         tempCanvas.height = targetHeight;
         const tempCtx = tempCanvas.getContext('2d');
@@ -224,12 +224,24 @@
 
         const vWidth = video.videoWidth || 640;
         const vHeight = video.videoHeight || 480;
-        const sourceWidth = vHeight * (targetWidth / targetHeight);
-        const sourceX = (vWidth - sourceWidth) / 2;
+
+        // Calculate aspect fill crop (center cropping)
+        const targetAspect = targetWidth / targetHeight;
+        const videoAspect = vWidth / vHeight;
+
+        let sourceX = 0, sourceY = 0, sourceWidth = vWidth, sourceHeight = vHeight;
+
+        if (videoAspect > targetAspect) {
+          sourceWidth = vHeight * targetAspect;
+          sourceX = (vWidth - sourceWidth) / 2;
+        } else {
+          sourceHeight = vWidth / targetAspect;
+          sourceY = (vHeight - sourceHeight) / 2;
+        }
 
         tempCtx.drawImage(
           video,
-          sourceX, 0, sourceWidth, vHeight,
+          sourceX, sourceY, sourceWidth, sourceHeight,
           0, 0, targetWidth, targetHeight
         );
         
@@ -318,18 +330,104 @@
       }
     }
 
-    // Dynamic Side Decorators Generator
+    function drawNailong(x, y, size, angleDegrees, emotion = 'happy') {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate((angleDegrees * Math.PI) / 180);
+
+      ctx.fillStyle = '#FFD700';
+      ctx.beginPath(); ctx.ellipse(0, 0, size * 0.35, size * 0.38, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#FFF8DC';
+      ctx.beginPath(); ctx.ellipse(0, size * 0.08, size * 0.22, size * 0.24, 0, 0, Math.PI * 2); ctx.fill();
+
+      ctx.fillStyle = '#FFA07A';
+      ctx.beginPath(); ctx.ellipse(-size * 0.22, -size * 0.02, size * 0.05, size * 0.03, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(size * 0.22, -size * 0.02, size * 0.05, size * 0.03, 0, 0, Math.PI * 2); ctx.fill();
+
+      ctx.fillStyle = '#000';
+      if (emotion === 'surprised') {
+        ctx.beginPath(); ctx.arc(-size * 0.14, -size * 0.12, size * 0.06, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(size * 0.14, -size * 0.12, size * 0.06, 0, Math.PI * 2); ctx.fill();
+      } else if (emotion === 'wink') {
+        ctx.beginPath(); ctx.arc(-size * 0.14, -size * 0.12, size * 0.05, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(size * 0.14, -size * 0.12, size * 0.04, 0.2 * Math.PI, 0.8 * Math.PI); ctx.stroke();
+      } else {
+        ctx.beginPath(); ctx.arc(-size * 0.14, -size * 0.12, size * 0.05, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(size * 0.14, -size * 0.12, size * 0.05, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#FFF';
+        ctx.beginPath(); ctx.arc(-size * 0.12, -size * 0.14, size * 0.018, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(size * 0.16, -size * 0.14, size * 0.018, 0, Math.PI * 2); ctx.fill();
+      }
+
+      ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
+      if (emotion === 'surprised') {
+        ctx.fillStyle = '#D32F2F';
+        ctx.beginPath(); ctx.arc(0, size * 0.03, size * 0.05, 0, Math.PI * 2); ctx.fill();
+      } else if (emotion === 'excited') {
+        ctx.fillStyle = '#D32F2F';
+        ctx.beginPath(); ctx.arc(0, -size * 0.01, size * 0.08, 0, Math.PI); ctx.fill();
+      } else {
+        ctx.beginPath(); ctx.arc(0, -size * 0.01, size * 0.08, 0.1 * Math.PI, 0.9 * Math.PI); ctx.stroke();
+      }
+
+      ctx.fillStyle = '#FF8C00';
+      ctx.beginPath(); ctx.moveTo(-size * 0.15, -size * 0.32); ctx.lineTo(-size * 0.08, -size * 0.45); ctx.lineTo(-size * 0.02, -size * 0.32); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(size * 0.02, -size * 0.32); ctx.lineTo(size * 0.08, -size * 0.45); ctx.lineTo(size * 0.15, -size * 0.32); ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawRabbit(x, y, size, angleDegrees) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate((angleDegrees * Math.PI) / 180);
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath(); ctx.ellipse(-size * 0.12, -size * 0.38, size * 0.07, size * 0.18, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(size * 0.12, -size * 0.38, size * 0.07, size * 0.18, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#FFB6C1';
+      ctx.beginPath(); ctx.ellipse(-size * 0.12, -size * 0.38, size * 0.04, size * 0.12, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(size * 0.12, -size * 0.38, size * 0.04, size * 0.12, 0, 0, Math.PI * 2); ctx.fill();
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath(); ctx.ellipse(0, 0, size * 0.32, size * 0.28, 0, 0, Math.PI * 2); ctx.fill();
+
+      ctx.fillStyle = '#333';
+      ctx.beginPath(); ctx.arc(-size * 0.12, -size * 0.05, size * 0.04, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(size * 0.12, -size * 0.05, size * 0.04, 0, Math.PI * 2); ctx.fill();
+
+      ctx.fillStyle = '#FFB6C1';
+      ctx.beginPath(); ctx.ellipse(-size * 0.22, size * 0.02, size * 0.05, size * 0.03, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(size * 0.22, size * 0.02, size * 0.05, size * 0.03, 0, 0, Math.PI * 2); ctx.fill();
+
+      ctx.fillStyle = '#FFB6C1';
+      ctx.beginPath(); ctx.arc(0, 0, size * 0.03, 0, Math.PI * 2); ctx.fill();
+
+      ctx.restore();
+    }
+
     function drawSideDecorations(theme, topOffset, photoHeight, photoGap) {
-      if (theme === 'white') return; // White theme is kept clean with no side emojis
+      const leftX = 12;
+      const rightX = canvas.width - 12;
+
+      if (theme === 'white') {
+        drawNailong(leftX, topOffset + (photoHeight * 0.25), 24, -20, 'happy');
+        drawRabbit(leftX, topOffset + photoHeight + photoGap + (photoHeight * 0.25), 24, 15);
+        drawNailong(leftX, topOffset + (photoHeight * 2) + (photoGap * 2) + (photoHeight * 0.25), 24, -15, 'surprised');
+        drawRabbit(leftX, canvas.height - 75, 24, 20);
+
+        drawRabbit(rightX, topOffset + (photoHeight * 0.5), 24, 20);
+        drawNailong(rightX, topOffset + photoHeight + photoGap + (photoHeight * 0.5), 24, -20, 'wink');
+        drawRabbit(rightX, topOffset + (photoHeight * 2) + (photoGap * 2) + (photoHeight * 0.5), 24, 15);
+        drawNailong(rightX, canvas.height - 65, 24, -10, 'excited');
+        return;
+      }
 
       ctx.save();
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      const leftX = 12;
-      const rightX = canvas.width - 12;
-
-      // Positions along the side of the 3 photos
       const positionsY = [
         topOffset + (photoHeight * 0.25),
         topOffset + (photoHeight * 0.75),
@@ -389,11 +487,9 @@
     function renderPhotostrip() {
       const selectedTheme = frameThemeSelect.value;
       
-      // Clear canvas & Draw background
       ctx.restore();
       drawFrameBackground(selectedTheme);
 
-      // Canvas dimensions and bounds calculation
       const sideMargin = 25;
       const footerMargin = 35;
       const topHeaderOffset = (selectedTheme === 'newspaper') ? 60 : 18;
@@ -403,7 +499,6 @@
       const totalAvailableHeight = canvas.height - topHeaderOffset - footerMargin;
       const photoHeight = Math.floor((totalAvailableHeight - (photoGap * 2)) / 3);
 
-      // Render 3 Photos
       currentPhotos.forEach((photoCanvas, index) => {
         const yOffset = topHeaderOffset + (index * (photoHeight + photoGap));
         
@@ -412,7 +507,6 @@
         ctx.lineWidth = (selectedTheme === 'newspaper') ? 2 : 1;
         ctx.strokeRect(sideMargin - 1, yOffset - 1, photoWidth + 2, photoHeight + 2);
 
-        // Apply Newspaper Grayscale Filter
         if (selectedTheme === 'newspaper') {
           ctx.filter = 'grayscale(100%) contrast(110%)';
         } else {
@@ -423,10 +517,8 @@
         ctx.restore();
       });
 
-      // Render Dynamic Side Emojis / Decorators based on theme
       drawSideDecorations(selectedTheme, topHeaderOffset, photoHeight, photoGap);
 
-      // Bottom Footer Text
       ctx.fillStyle = (selectedTheme === 'moonlight' || selectedTheme === 'checkered') ? '#ffffff' : '#111111';
       ctx.font = 'bold 11px "Times New Roman", Georgia, serif';
       ctx.textAlign = 'center';
@@ -439,7 +531,6 @@
         ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, canvas.height - 14);
       }
 
-      // Display controls & update download link
       canvas.style.display = 'block';
       themeSelector.style.display = 'flex';
       downloadLink.href = canvas.toDataURL('image/png');
